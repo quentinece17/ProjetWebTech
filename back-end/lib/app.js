@@ -32,6 +32,7 @@ app.post('/channels', async (req, res) => {
 })
 
 app.get('/channels/:id', async (req, res) => {
+  console.log(req.params.id + " ; " + JSON.stringify(req.body))
   const channel = await db.channels.get(req.params.id)
   res.json(channel)
 })

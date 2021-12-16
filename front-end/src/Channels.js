@@ -37,12 +37,30 @@ export default function Channels() {
   useEffect( () => {
     const fetch = async () => {
       try{
-        const {data: channels} = await axios.get('http://localhost:3001/channels', {
+        const {data: channels} = await axios.get('http://localhost:3001/channels', 
+        {
           headers: {
             'Authorization': `Bearer ${oauth.access_token}`
           }
-        })
-        setChannels(channels)
+        },)
+
+        var currentChannels = []
+
+        for (let i=0; i<channels.length; i++) {
+
+          if (channels[i].members) {
+
+            for (let j=0; j<channels[i].members.length; j++) {
+
+              if (channels[i].members[j] == oauth.email) {
+
+                currentChannels[currentChannels.length] = channels[i]
+              }
+            }
+          }
+        }
+
+        setChannels(currentChannels)
       }catch(err){
         console.error(err)
       }

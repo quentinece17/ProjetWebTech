@@ -10,6 +10,7 @@ module.exports = {
     create: async (channel) => {
       if(!channel.name) throw Error('Invalid channel')
       const id = uuid()
+      // console.log (channel)
       await db.put(`channels:${id}`, JSON.stringify(channel))
       return merge(channel, {id: id})
     },
@@ -36,6 +37,27 @@ module.exports = {
         })
       })
     },
+    // list2: async (props) => {
+    //   return new Promise( (resolve, reject) => {
+    //     const email = props.email
+    //     console.log("email: " + email)
+    //     const channels = []
+    //     db.createReadStream({
+    //       gt: "channels:",
+    //       lte: "channels" + String.fromCharCode(":".charCodeAt(0) + 1),
+    //     }).on( 'data', ({key, value}) => {
+    //       channel = JSON.parse(value)
+    //       channel.id = key.split(':')[1]
+    //       // if (channel.members === email){
+    //         channels.push(channel)
+    //       // }
+    //     }).on( 'error', (err) => {
+    //       reject(err)
+    //     }).on( 'end', () => {
+    //       resolve(channels)
+    //     })
+    //   })
+    // },
     update: (id, channel) => {
       const original = store.channels[id]
       if(!original) throw Error('Unregistered channel id')
