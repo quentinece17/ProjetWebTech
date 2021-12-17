@@ -61,13 +61,21 @@ const useStyles = (theme) => ({
   },
 })
 
-const onSubmit = async (props) => {
-  await axios.delete(
-         `http://localhost:3001/channels/${props.channelId}/messages`
-       ,{data: {
-         creation: props.creation,
-       }})
-       window.location.reload(); 
+const onSubmitMessage = async (props) => {
+  console.log("message: " + props)
+  try{
+      await axios.delete(`http://localhost:3001/channels/${props.channelId}/messages`,
+      { data: {
+            creation: props.creation,
+      }
+    })
+
+    window.location.reload(); 
+
+  } catch(err) {
+    alert ("OUPS");
+  }
+  
  }
 
 function AuthorMessage (props) {
@@ -81,7 +89,7 @@ function AuthorMessage (props) {
         variant="outlined" 
         startIcon={<DeleteIcon />}
         onClick={() => {
-          onSubmit(props)
+          onSubmitMessage(props)
         }}
       >Delete
       </Button>
@@ -114,9 +122,11 @@ export default forwardRef(({
     scrollEl.current.scrollIntoView()
   }
 
+  const navigate = useNavigate();
   const {
     oauth, setOauth,
-    drawerVisible, setDrawerVisible
+    drawerVisible, setDrawerVisible,
+    channels, setChannels
   } = useContext(Context)
 
   // See https://dev.to/n8tb1t/tracking-scroll-position-with-react-hooks-3bbj
@@ -136,9 +146,77 @@ export default forwardRef(({
     rootNode.addEventListener('scroll', handleScroll)
     return () => rootNode.removeEventListener('scroll', handleScroll)
   })
+
+  const onSubmitChannel = async (props) => {
+    try{
+        await axios.delete( `http://localhost:3001/channels/${props.id}/`)
+
+        try{
+          const {data: newChannels} = await axios.get('http://localhost:3001/channels', 
+          {
+            headers: {
+              'Authorization': `Bearer ${oauth.access_token}`
+            }
+          },)
+          navigate('/channels')
+
+          var currentChannels = []
+
+          for (let i=0; i<newChannels.length; i++) {
+
+            if (newChannels[i].members) {
+
+              for (let j=0; j<newChannels[i].members.length; j++) {
+
+                if (newChannels[i].members[j] === oauth.email) {
+                  currentChannels[currentChannels.length] = newChannels[i]
+                }
+              }
+            }
+          }
+          
+          setChannels(currentChannels)
+
+        }catch (err){
+          alert("oups");
+        }
+
+    } catch (err) {
+      alert("OUPS");
+    }
+   }
+  
+  function DeleteChannel (props) {
+  
+    const log = props.oauth.email;
+    
+    if (log === props.owner) {
+      return (
+  
+        <Button 
+          variant="outlined" 
+          startIcon={<DeleteIcon />}
+          onClick={() => {
+            onSubmitChannel(props)
+          }}
+        >Delete
+        </Button>
+      )
+    }
+    return (
+      <Button 
+          variant="outlined" 
+          startIcon={<DeleteIcon />}
+          disabled
+        >Delete
+        </Button>
+    )
+    }
+
   return (
     <div css={styles.root} ref={rootEl}>
       <h1>Messages for {channel.name}</h1>
+      <DeleteChannel owner={channel.owner} id={channel.id} oauth={oauth}/>
       <ul>
         { messages.map( (message, i) => {
             const {value} = unified()

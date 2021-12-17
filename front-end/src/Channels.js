@@ -44,6 +44,7 @@ export default function Channels() {
           }
         },)
 
+        console.log(channels)
         var currentChannels = []
 
         for (let i=0; i<channels.length; i++) {
@@ -52,8 +53,7 @@ export default function Channels() {
 
             for (let j=0; j<channels[i].members.length; j++) {
 
-              if (channels[i].members[j] == oauth.email) {
-
+              if (channels[i].members[j] === oauth.email) {
                 currentChannels[currentChannels.length] = channels[i]
               }
             }

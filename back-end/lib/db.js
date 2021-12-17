@@ -37,36 +37,14 @@ module.exports = {
         })
       })
     },
-    // list2: async (props) => {
-    //   return new Promise( (resolve, reject) => {
-    //     const email = props.email
-    //     console.log("email: " + email)
-    //     const channels = []
-    //     db.createReadStream({
-    //       gt: "channels:",
-    //       lte: "channels" + String.fromCharCode(":".charCodeAt(0) + 1),
-    //     }).on( 'data', ({key, value}) => {
-    //       channel = JSON.parse(value)
-    //       channel.id = key.split(':')[1]
-    //       // if (channel.members === email){
-    //         channels.push(channel)
-    //       // }
-    //     }).on( 'error', (err) => {
-    //       reject(err)
-    //     }).on( 'end', () => {
-    //       resolve(channels)
-    //     })
-    //   })
-    // },
     update: (id, channel) => {
       const original = store.channels[id]
       if(!original) throw Error('Unregistered channel id')
       store.channels[id] = merge(original, channel)
     },
-    delete: (id, channel) => {
-      const original = store.channels[id]
-      if(!original) throw Error('Unregistered channel id')
-      delete store.channels[id]
+    delete: (id) => {
+      if(!id) {throw Error('Invalid channel')}
+      db.del(`channels:${id}`, function(err){})
     }
   },
   messages: {
@@ -135,6 +113,7 @@ module.exports = {
         }).on( 'end', () => {
           resolve(users)
         })
+        console.log(users)
       })
     },
     update: (id, user) => {

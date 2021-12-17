@@ -132,7 +132,8 @@ const config = {
   }].map( async (channel) => {
     const {data: {id}} = await axios.post(`http://localhost:${config.port}/channels`, {
       name: channel.name,
-      members: channel.members
+      members: channel.members,
+      owner: channel.owner,
     })
     return Promise.all( channel.messages.map( async (message) => {
       await axios.post(`http://localhost:${config.port}/channels/${id}/messages`, message)
