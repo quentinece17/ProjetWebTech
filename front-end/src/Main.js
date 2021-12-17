@@ -1,4 +1,3 @@
-
 /** @jsxImportSource @emotion/react */
 import {useContext} from 'react'
 // Layout
@@ -10,6 +9,8 @@ import Context from './Context'
 import Channels from './Channels'
 import Channel from './Channel'
 import Welcome from './Welcome'
+import NewChannel from './NewChannel'
+import InviteUser from './InviteUser'
 import {
   Route,
   Routes,
@@ -61,6 +62,8 @@ export default function Main() {
       <Routes>
         <Route path=":id" element={<Channel />}/>
         <Route path="*" element={<Welcome />}/>
+        <Route path="/NewChannel" element={<NewChannel />}/>
+        <Route path="/InviteUser" element={<InviteUser />}/>
       </Routes>
     </main>
   );

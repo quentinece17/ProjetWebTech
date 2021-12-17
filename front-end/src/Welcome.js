@@ -2,10 +2,12 @@
 /** @jsxImportSource @emotion/react */
 // Layout
 import { useTheme } from '@mui/styles';
-import { Grid, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import { ReactComponent as ChannelIcon } from './icons/channel.svg';
 import { ReactComponent as FriendsIcon } from './icons/friends.svg';
 import { ReactComponent as SettingsIcon } from './icons/settings.svg';
+
+import {useNavigate} from "react-router-dom";
 
 const useStyles = (theme) => ({
   root: {
@@ -24,6 +26,7 @@ const useStyles = (theme) => ({
 })
 
 export default function Welcome() {
+  const navigate = useNavigate();
   const styles = useStyles(useTheme())
   return (
     <div css={styles.root}>
@@ -36,7 +39,13 @@ export default function Welcome() {
       >
         <Grid item xs>
           <div css={styles.card}>
-            <ChannelIcon css={styles.icon} />
+            <ChannelIcon 
+              css={styles.icon} 
+              onClick={(e) => {
+                e.preventDefault();
+                 navigate('/channels/NewChannel')
+              }}
+            />
             <Typography color="textPrimary">
               Create channels
             </Typography>
@@ -44,7 +53,13 @@ export default function Welcome() {
         </Grid>
         <Grid item xs>
           <div css={styles.card}>
-            <FriendsIcon css={styles.icon} />
+            <FriendsIcon 
+              css={styles.icon}
+              onClick={(e) => {
+                e.preventDefault();
+                 navigate('/channels/InviteUser')
+              }}
+            />
             <Typography color="textPrimary">
               Invite friends
             </Typography>
