@@ -8,6 +8,11 @@ import axios from 'axios'
 // Layout
 import { useTheme } from '@mui/styles';
 import { Link } from '@mui/material';
+import { Button } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+
 // Local
 import Context from './Context'
 import {
@@ -53,7 +58,11 @@ const useStyles = (theme) => ({
 const Redirect = ({
   config,
   codeVerifier,
+  onUser,
 }) => {
+  const {
+    users, setUsers
+  } = useContext(Context)
   const styles = useStyles(useTheme())
   const redirect = (e) => {
     e.stopPropagation()
@@ -68,10 +77,11 @@ const Redirect = ({
       `code_challenge_method=S256`,
     ].join('')
     window.location = url
+    console.log("voila tac: " + config.client_id)
   }
   return (
     <div css={styles.root}>
-      <Link onClick={redirect} color="secondary">Login with OpenID Connect and OAuth2</Link>
+        <Link onClick={redirect} color="secondary">Login with OpenID Connect and OAuth2</Link>
     </div>
   )
 }
@@ -79,6 +89,7 @@ const Redirect = ({
 const Tokens = ({
   oauth
 }) => {
+  console.log("in token")
   const {setOauth} = useContext(Context)
   const styles = useStyles(useTheme())
   const {id_token} = oauth
@@ -95,12 +106,42 @@ const Tokens = ({
   )
 }
 
+const CheckEmail = async (prop)=> {
+
+  try{
+      const {data: users} = await axios.get(`http://localhost:3001/users/`,)
+      
+      console.log ("Current users: ", users)
+      var valid = Boolean(false);
+
+      if (users.length != 0) {
+        for (let i=0; i<users.length; i++) {
+          if (users[i].username === prop) {
+            valid = true
+          }
+        }
+      } 
+
+      if (valid !== true){
+        try{
+          const {data: newUser} = await axios.post(`http://localhost:3001/users`, { username: prop})
+          console.log("nouveau user:", newUser)
+        }catch (err) {
+          alert("oups");
+        }
+      } 
+      
+  }catch(err){
+    alert("oups");
+  }
+}
+
 const LoadToken = ({
   code,
   codeVerifier,
   config,
   removeCookie,
-  setOauth
+  setOauth, 
 }) => {
   const styles = useStyles(useTheme())
   const navigate = useNavigate();
@@ -118,6 +159,7 @@ const LoadToken = ({
         }))
         removeCookie('code_verifier')
         setOauth(data)
+        CheckEmail(data.email);
         navigate('/')
       }catch (err) {
         console.error(err)
@@ -128,6 +170,11 @@ const LoadToken = ({
   return (
     <div css={styles.root}>Loading tokens</div>
   )
+}
+
+const CheckMail = ({oauth}) => {
+
+  console.log("email : " + oauth.email)
 }
 
 export default function Login({
@@ -144,6 +191,7 @@ export default function Login({
     redirect_uri: 'http://localhost:3000',
     scope: 'openid%20email%20offline_access',
   }
+
   const params = new URLSearchParams(window.location.search)
   const code = params.get('code')
   // is there a code query parameters in the url 
@@ -153,9 +201,10 @@ export default function Login({
       console.log('set code_verifier', codeVerifier)
       setCookie('code_verifier', codeVerifier)
       return (
-        <Redirect codeVerifier={codeVerifier} config={config} css={styles.root} />
+        <Redirect codeVerifier={codeVerifier} config={config} onUser={onUser} css={styles.root} />
       )
     }else{ // yes: user is already logged in, great, is is working
+      console.log("in else")
       return (
         <Tokens oauth={oauth} css={styles.root} />
       )
@@ -168,7 +217,7 @@ export default function Login({
         codeVerifier={cookies.code_verifier}
         config={config}
         setOauth={setOauth}
-        removeCookie={removeCookie} />
-    )
+        removeCookie={removeCookie}/>
+      )
   }
 }

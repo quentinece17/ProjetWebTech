@@ -135,9 +135,13 @@ const config = {
       members: channel.members,
       owner: channel.owner,
     })
+
     return Promise.all( channel.messages.map( async (message) => {
       await axios.post(`http://localhost:${config.port}/channels/${id}/messages`, message)
     }))
   }))
+
+  await axios.post(`http://localhost:${config.port}/users`, { username: 'default@user.com'})
+
   process.exit()
 })();
