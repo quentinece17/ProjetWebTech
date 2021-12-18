@@ -213,10 +213,58 @@ export default forwardRef(({
     )
     }
 
+    const updateChannelName = async (id, name) => {
+
+      try{
+
+        const channel = await axios.get( `http://localhost:3001/channels/${id}`)
+
+        //Update name of the channel
+        channel.data.name = name;
+
+        //Add a member to a channel
+        //Remplacer email par l'email récupérer dans le field pour ajouter un user au channel
+        // channel.data.members[channel.data.members.length] = email  
+
+        //Eviter d'ajouter un membre existant au channel 
+        // if(!currentChannel.data.members.includes(email))
+        // {
+        // currentChannel.data.members[currentChannel.data.members.length]=email;
+        // }
+        // else {
+        //   alert('User already member');
+        // }
+
+        await axios.put(`http://localhost:3001/channels/${id}`, 
+        {
+          data: {
+            channel: channel
+          }
+        })
+
+        var newcurrentChannel = await axios.get(
+          `http://localhost:3001/channels/${id}`
+        )
+
+      }catch(err) {
+        alert("OUPS");
+      }
+    }
+
   return (
     <div css={styles.root} ref={rootEl}>
       <h1>Messages for {channel.name}</h1>
       <DeleteChannel owner={channel.owner} id={channel.id} oauth={oauth}/>
+
+      {/*MEttre un TextField pour recup de nouveau nom à mettre à la place de "nouv"*/}
+
+      <Button 
+        onClick={() => {
+          updateChannelName(channel.id,"nouv")
+        }}
+      >
+        Update Name Channel
+      </Button>
       <ul>
         { messages.map( (message, i) => {
             const {value} = unified()
