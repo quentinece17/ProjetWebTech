@@ -6,6 +6,8 @@ import { useTheme } from '@mui/styles';
 import { IconButton, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Context from './Context';
+import Gravatar from './Gravatar.js'
+
 
 const useStyles = (theme) => ({
   header: {
@@ -58,6 +60,8 @@ export default function Header({
         oauth ?
           <span>
             Hello {oauth.email}
+            <Gravatar/>
+
             <br />
             <Link onClick={onClickLogout}>logout</Link>
           </span>
