@@ -82,7 +82,7 @@ export default function Channel() {
       />
       <Form addMessage={addMessage} channel={channel} />
       <Fab
-        color="primary"
+        style={{backgroundColor: '#FFFFFF', color: '#2f435e'}}
         aria-label="Latest messages"
         css={[styles.fab, scrollDown || styles.fabDisabled]}
         onClick={onClickScroll}

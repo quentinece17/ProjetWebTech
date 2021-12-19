@@ -13,6 +13,7 @@ const styles = {
   root: {
     backgroundColor: '#44566c',
     '& a': {
+      color: '#FFFFFF',
       padding: '.2rem .5rem',
       whiteSpace: 'nowrap', 
     }
@@ -44,7 +45,6 @@ export default function Channels() {
           }
         },)
 
-        console.log(channels)
         var currentChannels = []
 
         for (let i=0; i<channels.length; i++) {

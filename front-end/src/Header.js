@@ -60,7 +60,7 @@ export default function Header({
         oauth ?
           <span>
             Hello {oauth.email}
-            <Gravatar/>
+            {/* <Gravatar/> */}
 
             <br />
             <Link onClick={onClickLogout}>logout</Link>

@@ -4,11 +4,6 @@ import React from "react";
 
 import Gravatar from 'react-gravatar'
 import Context from './Context'
-//import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-// import DropDown from './dropDown'
-import IconButton from '@mui/material/IconButton';
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { useNavigate } from 'react-router';
 
@@ -24,14 +19,15 @@ const styles = {
     },
 }
 
-export default function Design ({name}){
+export default function Design ({}){
+
+const {oauth} = useContext(Context)
 
 return (
     <div>
         <Gravatar
-        email="mathews.kyle@gmail.com"
-        style={{borderRadius: "100%"}}
+            email={oauth.email}
+            style={{borderRadius: "100%"}}
         />
     </div>
-)
-}
+)}

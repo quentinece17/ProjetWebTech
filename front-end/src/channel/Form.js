@@ -18,6 +18,7 @@ const useStyles = (theme) => {
       borderTop: `2px solid ${borderColor}`,
       padding: '.5rem',
       display: 'flex',
+
     },
     content: {
       flex: '1 1 auto',
@@ -67,6 +68,7 @@ export default function Form({
       />
       <div>
         <Button
+          style={{backgroundColor: '#FFFFFF', color: '#2f435e'}}
           variant="contained"
           color="primary"
           css={styles.send}
