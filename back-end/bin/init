@@ -141,7 +141,13 @@ const config = {
     }))
   }))
 
-  await axios.post(`http://localhost:${config.port}/users`, { username: 'default@user.com'})
+  await axios.post(`http://localhost:${config.port}/users`, 
+  { username: 'quentin.appelghem@edu.ece.fr',
+    type: 'Male',
+    language: 'English',
+    theme: 'true',
+    sourdine: 'true'
+  })
 
   process.exit()
 })();

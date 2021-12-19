@@ -111,7 +111,7 @@ const CheckEmail = async (prop)=> {
   try{
       const {data: users} = await axios.get(`http://localhost:3001/users/`,)
       
-      console.log ("Current users: ", users)
+      console.log ("Current user: ", users)
       var valid = Boolean(false);
 
       if (users.length != 0) {
@@ -124,7 +124,13 @@ const CheckEmail = async (prop)=> {
 
       if (valid !== true){
         try{
-          const {data: newUser} = await axios.post(`http://localhost:3001/users`, { username: prop})
+          const {data: newUser} = await axios.post(`http://localhost:3001/users`, 
+          { username: prop, 
+            type: "Male",
+            language: "English",
+            theme: "true",
+            sourdine: "false",
+          })
           console.log("nouveau user:", newUser)
         }catch (err) {
           alert("oups");

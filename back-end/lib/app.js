@@ -28,7 +28,6 @@ app.get('/channels', authenticate, async (req, res) => {
 
 app.post('/channels', async (req, res) => {
   const channel = await db.channels.create(req.body)
-  console.log("in app.js: " + JSON.stringify(channel))
   res.status(201).json(channel)
 })
 
@@ -43,7 +42,6 @@ app.put('/channels/:id', async (req, res) => {
 })
 
 app.delete('/channels/:id', async (req, res) => {
-  console.log(JSON.stringify(req.params.id))
   const channel = await db.channels.delete(req.params.id)
   res.json(channel)
 })
@@ -75,7 +73,6 @@ app.delete('/channels/:id/messages', async (req, res) => {
 
 app.get('/users', async (req, res) => {
   const users = await db.users.list()
-  console.log("in app.js")
   res.json(users)
 })
 
@@ -85,11 +82,14 @@ app.post('/users', async (req, res) => {
 })
 
 app.get('/users/:id', async (req, res) => {
+  console.log(req.params.id)
   const user = await db.users.get(req.params.id)
   res.json(user)
 })
 
 app.put('/users/:id', async (req, res) => {
+  console.log(req.params.id)
+  console.log(req.body)
   const user = await db.users.update(req.body)
   res.json(user)
 })

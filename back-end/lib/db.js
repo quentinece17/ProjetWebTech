@@ -95,9 +95,11 @@ module.exports = {
       return merge(user, {id: id})
     },
     get: async (id) => {
+      console.log("in db: " + id)
       if(!id) throw Error('Invalid id')
       const data = await db.get(`users:${id}`)
       const user = JSON.parse(data)
+      console.log("in db: ", user)
       return merge(user, {id: id})
     },
     list: async () => {
@@ -118,10 +120,12 @@ module.exports = {
         console.log(users)
       })
     },
-    update: (id, user) => {
-      const original = store.users[id]
-      if(!original) throw Error('Unregistered user id')
-      store.users[id] = merge(original, user)
+    update: (id) => {
+      var currentUser = id.data.user.data
+      var currentId = id.data.user.data.id
+      if(!currentId) throw Error('Invalid ID')
+      db.put(`users:${currentId}`, JSON.stringify(currentUser))
+      return merge(currentUser, {id: currentId})
     },
     delete: (id, user) => {
       const original = store.users[id]
