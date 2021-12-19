@@ -162,6 +162,8 @@ export default forwardRef(({
   const [openDelete, setOpenDelete] = React.useState(false);
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [openFriends, setOpenFriends] = React.useState(false);
+  const [openList, setOpenList] = React.useState(false);
+  const [membersChannel, setMembersChannel] = useState("")
   const [name, setName] = useState()
   const [email, setEmail] = useState()
   const valueRef = useRef()
@@ -258,7 +260,13 @@ const friendsOpen = () => {
     setOpenFriends(false);
 };
 
+const listOpen = () => {
+  setOpenList(true);
+ }
 
+ const listClose = () => {
+    setOpenList(false);
+};
  
 const newChannelName = () => {
   setName((prevState) => prevState = valueRef.current.value);
@@ -381,6 +389,22 @@ const updateChannel = async (id, source) => {
   }
 }
 
+const getMembers = async (props) => {
+
+  try {
+
+  const {data: channel} = await axios.get( `http://localhost:3001/channels/${props}`)
+
+  console.log(channel.members)
+
+  setMembersChannel(channel.members)
+
+  console.log(membersChannel)
+
+  } catch (err) {
+    alert("Invalid members")
+  }
+}
 
   return (
     <div css={styles.root} ref={rootEl}>
@@ -475,6 +499,32 @@ const updateChannel = async (id, source) => {
                               popupState.close();
                               }}>Enter</Button>
                         </DialogActions>
+                      </Dialog>
+                    </div>
+                  </MenuItem>
+                  <MenuItem>
+                    <div>
+                      <Button 
+                        variant="outlined" 
+                        style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+                        onClick={() => {
+                          listOpen();
+                          getMembers(channel.id);
+                          }}
+                        >Channel's Members
+                      </Button>
+                      <Dialog open={openList} onClose={listClose}>
+                        <DialogTitle>List of all the channel's members</DialogTitle>
+                        <DialogContent>
+                        <TextField
+                          id="filled-hidden-label-small"
+                          margin="dense"
+                          fullWidth
+                          value={membersChannel}
+                          variant="filled"
+                          size="small"
+                        />
+                        </DialogContent>
                       </Dialog>
                     </div>
                   </MenuItem>
