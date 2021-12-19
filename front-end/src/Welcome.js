@@ -126,7 +126,9 @@ export default function Welcome() {
 
   const valueRef = useRef()
 
+  const [nameNewChannel, setNameNewChannel] = useState()
   const [openSettings, setOpenSettings] = useState(false)
+  const [openNewChannel, setNewChannel] = useState(false)
   const [openUpdate, setOpenUpdate] = useState(false)
   const [userId, setUserId] = useState("")
   const [userUsername, setUserUsername] = useState("")
@@ -145,6 +147,13 @@ export default function Welcome() {
       setOpenSettings(false);
   }
 
+  const newChannelOpen = () => {
+    setNewChannel(true);
+  }
+
+  const newChannelClose = () => {
+    setNewChannel(false);
+  }
 
   const updateOpen = () => {
     setOpenUpdate(true);
@@ -174,6 +183,27 @@ export default function Welcome() {
   //   setUserImage((prevState) => prevState = valueRef.current.value);
   // }
 
+  const newChannelName = () => {
+    setNameNewChannel((prevState) => prevState = valueRef.current.value);
+  }
+
+  const validChannel = () => {
+    addNewChannel();
+  }
+
+  const addNewChannel = async () => {
+    try{
+      const {data: newChannel} = await axios.post(`http://localhost:${config.port}/channels`, {
+        name: nameNewChannel,
+        members:[oauth.email],
+        owner: oauth.email
+    })
+    navigate('/channels')
+    setChannels([...channels, newChannel])
+    }catch(err){
+      alert("OUPS");
+    }
+  }
 
   const getUser = async () => {
 
@@ -239,13 +269,39 @@ const updateUser = async () => {
             <ChannelIcon 
               css={styles.icon} 
               onClick={(e) => {
-                e.preventDefault();
-                 navigate('/channels/NewChannel')
+                newChannelOpen();
+                // e.preventDefault();
+                //  navigate('/channels/NewChannel')
               }}
             />
             <Typography color="textPrimary">
               Create channels
             </Typography>
+            <Dialog 
+              open={openNewChannel} 
+              onClose={newChannelClose}
+            >
+              <DialogTitle>Create New Channel</DialogTitle>
+              <br/>
+              <DialogContent>
+                <TextField
+                  id="channel-name"
+                  helperText="Your new channel's name"
+                  label="Channel name"
+                  type="Required"
+                  inputRef={valueRef}
+                  onChange={() => newChannelName()}
+                />
+              </DialogContent>
+              <DialogActions>
+              <Button 
+                style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                onClick={ () => {
+                  validChannel();
+                  newChannelClose();
+                }}>Enter</Button>
+              </DialogActions>
+            </Dialog>
           </div>
         </Grid>
         <Grid item xs>
