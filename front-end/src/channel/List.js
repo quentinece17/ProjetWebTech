@@ -1,10 +1,37 @@
 
 /** @jsxImportSource @emotion/react */
-import {forwardRef, useImperativeHandle, useLayoutEffect, useRef, useContext} from 'react'
+import {forwardRef, useImperativeHandle, useLayoutEffect, useRef, useContext, useState} from 'react'
+import * as React from 'react';
+
 // Layout
 import { useTheme } from '@mui/styles';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';   
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Stack from '@mui/material/Stack';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import { FixedSizeList } from 'react-window';
+
+import Gravatar from 'react-gravatar'
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
 
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -86,6 +113,8 @@ function AuthorMessage (props) {
     return (
 
       <Button 
+        size="small"
+        style={{backgroundColor: '#FFFFFF', color: '#2f435e'}}
         variant="outlined" 
         startIcon={<DeleteIcon />}
         onClick={() => {
@@ -97,6 +126,7 @@ function AuthorMessage (props) {
   }
   return (
     <Button 
+        size="small"
         variant="outlined" 
         startIcon={<DeleteIcon />}
         disabled
@@ -129,6 +159,13 @@ export default forwardRef(({
     channels, setChannels
   } = useContext(Context)
 
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const [openUpdate, setOpenUpdate] = React.useState(false);
+  const [openFriends, setOpenFriends] = React.useState(false);
+  const [name, setName] = useState()
+  const [email, setEmail] = useState()
+  const valueRef = useRef()
+
   // See https://dev.to/n8tb1t/tracking-scroll-position-with-react-hooks-3bbj
   const throttleTimeout = useRef(null) // react-hooks/exhaustive-deps
   useLayoutEffect( () => {
@@ -151,56 +188,125 @@ export default forwardRef(({
     try{
         await axios.delete( `http://localhost:3001/channels/${props.id}/`)
 
-        try{
-          const {data: newChannels} = await axios.get('http://localhost:3001/channels', 
-          {
-            headers: {
-              'Authorization': `Bearer ${oauth.access_token}`
-            }
-          },)
-          navigate('/channels')
+        const {data: newChannels} = await axios.get('http://localhost:3001/channels', 
+        {
+          headers: {
+            'Authorization': `Bearer ${oauth.access_token}`
+          }
+        },)
+        navigate('/channels')
 
-          var currentChannels = []
+        var currentChannels = []
 
-          for (let i=0; i<newChannels.length; i++) {
+        for (let i=0; i<newChannels.length; i++) {
 
-            if (newChannels[i].members) {
+          if (newChannels[i].members) {
 
-              for (let j=0; j<newChannels[i].members.length; j++) {
+            for (let j=0; j<newChannels[i].members.length; j++) {
 
-                if (newChannels[i].members[j] === oauth.email) {
-                  currentChannels[currentChannels.length] = newChannels[i]
-                }
+              if (newChannels[i].members[j] === oauth.email) {
+                currentChannels[currentChannels.length] = newChannels[i]
               }
             }
           }
-          
-          setChannels(currentChannels)
-
-        }catch (err){
-          alert("oups");
         }
+        
+        setChannels(currentChannels)
 
     } catch (err) {
       alert("OUPS");
     }
    }
   
-  function DeleteChannel (props) {
+  //  *********************ALERTE***************************
+      //Faire appara^itre l'alarme uniquement si l'utilisateur appuie sur "delete"
+            // <Stack sx={{ width: '100%' }} spacing={2}>
+            //   <Alert severity="warning" action={
+            //       <Button color="inherit" size="small" onClick={() => {
+            //         onSubmitChannel(props)
+            //       }}>
+            //         Yes
+            //       </Button>
+            //     }>
+            //     <AlertTitle>Warning</AlertTitle>
+            //     Are you sure you want to <strong>DELETE</strong> this channel ? 
+            //   </Alert>
+            // </Stack>
+ //  *********************ALERTE***************************
+
+ const deleteOpen = () => {
+    setOpenDelete(true);
+ }
+
+ const deleteClose = () => {
+    setOpenDelete(false);
+};
+
+const updateOpen = () => {
+  setOpenUpdate(true);
+ }
+
+ const updateClose = () => {
+    setOpenUpdate(false);
+};
+
+const friendsOpen = () => {
+  setOpenFriends(true);
+ }
+
+ const friendsClose = () => {
+    setOpenFriends(false);
+};
+
+
+ 
+const newChannelName = () => {
+  setName((prevState) => prevState = valueRef.current.value);
+}
+
+const newFriendEmail = () => {
+  setEmail((prevState) => prevState = valueRef.current.value);
+}
+
+const DeleteChannel = (props) => {
   
     const log = props.oauth.email;
     
     if (log === props.owner) {
       return (
-  
-        <Button 
-          variant="outlined" 
-          startIcon={<DeleteIcon />}
-          onClick={() => {
-            onSubmitChannel(props)
-          }}
-        >Delete
-        </Button>
+        <div>
+          <Button 
+            variant="outlined" 
+            style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+            startIcon={<DeleteIcon />}
+            onClick={deleteOpen}
+          >Delete 
+          </Button>
+
+          <Dialog
+            open={openDelete}
+            onClose={deleteClose}
+            aria-labelledby="alert-dialog-title"
+          >
+          <DialogTitle>{"Are you sure you want to delete this channel?"}</DialogTitle>
+          <DialogActions>
+            <Button 
+              style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+              onClick={() => {
+                onSubmitChannel(props);
+                deleteClose();
+              }}>Yes
+            </Button>
+            <Button 
+              style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+              onClick={() => {
+                deleteClose();
+                props.pop.close();
+              }}>Cancel
+            </Button>
+          </DialogActions>
+          </Dialog>
+        </div>
       )
     }
     return (
@@ -213,58 +319,173 @@ export default forwardRef(({
     )
     }
 
-    const updateChannelName = async (id, name) => {
+const updateChannel = async (id, source) => {
 
-      try{
+  try{
 
-        const channel = await axios.get( `http://localhost:3001/channels/${id}`)
+    const channel = await axios.get( `http://localhost:3001/channels/${id}`)
 
-        //Update name of the channel
-        channel.data.name = name;
+    console.log("before update : ", channel)
 
-        //Add a member to a channel
-        //Remplacer email par l'email récupérer dans le field pour ajouter un user au channel
-        // channel.data.members[channel.data.members.length] = email  
-
-        //Eviter d'ajouter un membre existant au channel 
-        // if(!currentChannel.data.members.includes(email))
-        // {
-        // currentChannel.data.members[currentChannel.data.members.length]=email;
-        // }
-        // else {
-        //   alert('User already member');
-        // }
-
-        await axios.put(`http://localhost:3001/channels/${id}`, 
-        {
-          data: {
-            channel: channel
-          }
-        })
-
-        var newcurrentChannel = await axios.get(
-          `http://localhost:3001/channels/${id}`
-        )
-
-      }catch(err) {
-        alert("OUPS");
+    //Update name of the channel
+    if (source === 0) {
+      channel.data.name = name;
+    } else if (source === 1) {
+      //Add a member to a channel
+      if(!channel.data.members.includes(email)){
+        channel.data.members[channel.data.members.length]=email;
+      } else {
+        alert('User already member');
       }
     }
 
+    await axios.put(`http://localhost:3001/channels/${id}`, 
+    {
+      data: {
+        channel: channel
+      }
+    })
+
+    var newcurrentChannel = await axios.get(
+      `http://localhost:3001/channels/${id}`
+    )
+    console.log("after update : ", newcurrentChannel)
+
+    const {data: newChannels} = await axios.get('http://localhost:3001/channels', 
+        {
+          headers: {
+            'Authorization': `Bearer ${oauth.access_token}`
+          }
+        },)
+        navigate(`/channels/${id}`)
+
+        var currentChannels = []
+
+        for (let i=0; i<newChannels.length; i++) {
+
+          if (newChannels[i].members) {
+
+            for (let j=0; j<newChannels[i].members.length; j++) {
+
+              if (newChannels[i].members[j] === oauth.email) {
+                currentChannels[currentChannels.length] = newChannels[i]
+              }
+            }
+          }
+        }
+        
+    setChannels(currentChannels)
+
+  }catch(err) {
+    alert("OUPS");
+  }
+}
+
+
   return (
     <div css={styles.root} ref={rootEl}>
-      <h1>Messages for {channel.name}</h1>
-      <DeleteChannel owner={channel.owner} id={channel.id} oauth={oauth}/>
 
-      {/*MEttre un TextField pour recup de nouveau nom à mettre à la place de "nouv"*/}
+       <Box sx={{ flexGrow: 1}}>
+        <Grid container spacing={30}>
+          <Grid item xs={8}>
+            <h1>Messages for {channel.name}</h1>
+          </Grid>
+          <Grid item xs={4}>
+          <PopupState variant="popover" popupId="demo-popup-menu">
+            {(popupState) => (
+              <React.Fragment>
+                <Button 
+                  style={{backgroundColor: '#FFFFFF', color: '#2f435e'}}
+                  variant="contained" 
+                  {...bindTrigger(popupState)}
+                >
+                  Settings
+                </Button>
+                <Menu {...bindMenu(popupState)}>
+                  <MenuItem><DeleteChannel owner={channel.owner} id={channel.id} oauth={oauth} pop={popupState}/></MenuItem>
+                  <MenuItem>
+                    <div>
+                      <Button 
+                        variant="outlined" 
+                        style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+                        onClick={updateOpen}
+                        >Update Name
+                      </Button>
+                      <Dialog open={openUpdate} onClose={updateClose}>
+                        <DialogTitle>Update Channel Name</DialogTitle>
+                        <DialogContent>
+                          <DialogContentText>
+                            You can modify the name of the channel below.
+                          </DialogContentText>
+                          <TextField
+                            margin="dense"
+                            id="new-name"
+                            label="New Channel Name"
+                            type="Required"
+                            fullWidth
+                            variant="standard"
+                            inputRef={valueRef}
+                            onChange={() => newChannelName()}
+                          />
+                        </DialogContent>
+                        <DialogActions>
+                          <Button 
+                            style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                            onClick={() => {
+                              updateClose();
+                              updateChannel(channel.id, 0);
+                              popupState.close();
+                              }}>Enter</Button>
+                        </DialogActions>
+                      </Dialog>
+                    </div>
+                  </MenuItem>
+                  <MenuItem>
+                    <div>
+                      <Button 
+                        variant="outlined" 
+                        style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
+                        onClick={friendsOpen}
+                        >Invite Friends
+                      </Button>
+                      <Dialog open={openFriends} onClose={friendsClose}>
+                        <DialogTitle>Invite Friends to the Channel</DialogTitle>
+                        <DialogContent>
+                          <DialogContentText>
+                            You can invite your friends to the Channel if you want to speak to them here.
+                          </DialogContentText>
+                          <TextField
+                            margin="dense"
+                            id="new-friends"
+                            label="New Friend Email"
+                            helperText="Please enter the email of your friend"
+                            type="email"
+                            fullWidth
+                            variant="standard"
+                            inputRef={valueRef}
+                            onChange={() => newFriendEmail()}
+                          />
+                        </DialogContent>
+                        <DialogActions>
+                          <Button 
+                            style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                            onClick={() => {
+                              friendsClose();
+                              updateChannel(channel.id, 1);
+                              popupState.close();
+                              }}>Enter</Button>
+                        </DialogActions>
+                      </Dialog>
+                    </div>
+                  </MenuItem>
+                </Menu>
+              </React.Fragment>
+            )}
+          </PopupState>
+          </Grid>
+        </Grid>
+      </Box>
 
-      <Button 
-        onClick={() => {
-          updateChannelName(channel.id,"nouv")
-        }}
-      >
-        Update Name Channel
-      </Button>
       <ul>
         { messages.map( (message, i) => {
             const {value} = unified()
@@ -275,14 +496,18 @@ export default forwardRef(({
             return (
               <li key={i} css={styles.message}>
                 <p>
+                  <Gravatar
+                      email={message.author}
+                      style={{borderRadius: "100%", width: "30px", height: "30px"}}
+                  />__
                   <span>{message.author}</span>
                   {' - '}
-                  <span>{dayjs((message.creation)/1000).calendar()}</span>
+                  <span>{dayjs((message.creation)/1000).calendar()}</span>__
+                  {/* <div> */}
+                  <AuthorMessage email={message.author} creation={message.creation} channelId={message.channelId} oauth={oauth}/>
+                  {/* </div> */}
                 </p>
                 <div dangerouslySetInnerHTML={{__html: value}}>
-                </div>
-                <div>
-                  <AuthorMessage email={message.author} creation={message.creation} channelId={message.channelId} oauth={oauth}/>
                 </div>
               </li>
             )
