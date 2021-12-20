@@ -1,11 +1,13 @@
 
 /** @jsxImportSource @emotion/react */
 // Layout
-import { useTheme } from '@mui/styles';
-import { Button, Grid, Typography, TextField } from '@mui/material';
 import { ReactComponent as ChannelIcon } from './icons/channel.svg';
-import { ReactComponent as FriendsIcon } from './icons/friends.svg';
 import { ReactComponent as SettingsIcon } from './icons/settings.svg';
+import StarWarsImage from './icons/1.star-wars.jpeg';
+import GhettoImage from './icons/2.ghetto.jpg';
+import SquelettonImage from './icons/3.squeletton.jpeg';
+import PikachuImage from './icons/4.pikachu.jpeg';
+import LionImage from './icons/5.lion.jpeg';
 
 import {useState, useContext, useRef} from 'react'
 
@@ -13,10 +15,11 @@ import axios from 'axios';
 
 import Context from './Context';
 
+import { useTheme } from '@mui/styles';
+import { Button, Grid, Typography, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -30,12 +33,14 @@ import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import Link from '@mui/material/Link';
 
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
 
 import { alpha, styled } from '@mui/material/styles';
 
-import Gravatar from './Gravatar.js'
-
 import {useNavigate} from "react-router-dom";
+
+import Gravatar from 'react-gravatar'
 
 const config = {port: 3001};
 
@@ -50,8 +55,15 @@ const useStyles = (theme) => ({
     textAlign: 'center',
   },
   icon: {
+    cursor: 'pointer',
     width: '30%',
     fill: '#fff',
+    ':hover': {
+      backgroundColor: 'rgba(255,255,255,.05)',
+    }
+  },
+  image: {
+    cursor: 'pointer'
   }
 })
 
@@ -119,8 +131,7 @@ export default function Welcome() {
   const styles = useStyles(useTheme())
 
   const {
-    oauth, setOauth,
-    drawerVisible, setDrawerVisible,
+    oauth,
     channels, setChannels
   } = useContext(Context)
 
@@ -136,8 +147,9 @@ export default function Welcome() {
   const [userLanguage, setUserLanguage] = useState("")
   const [userSourdine, setUserSourdine] = useState()
   const [userTheme, setUserTheme] = useState()
-
-  // const [userImage, setUserImage] = useState("")
+  const [userImage, setUserImage] = useState(0)
+  const [email, setEmail] = useState()
+  const [members, setMembers] = useState([])
 
   const settingsOpen = () => {
     setOpenSettings(true);
@@ -153,6 +165,10 @@ export default function Welcome() {
 
   const newChannelClose = () => {
     setNewChannel(false);
+  }
+
+  const NewFriendEmail = (e) => {
+    setEmail(e.target.value);
   }
 
   const updateOpen = () => {
@@ -179,9 +195,9 @@ export default function Welcome() {
     setUserTheme(event.target.checked);
   }
 
-  // const newUserImage = () => {
-  //   setUserImage((prevState) => prevState = valueRef.current.value);
-  // }
+  const changeImage = (ref) => {
+    setUserImage(ref);
+  }
 
   const newChannelName = () => {
     setNameNewChannel((prevState) => prevState = valueRef.current.value);
@@ -191,11 +207,56 @@ export default function Welcome() {
     addNewChannel();
   }
 
+  const CurrentImage = () => {
+
+    if (userImage === 0) {
+      return (
+        <Gravatar
+        email={oauth.email}
+        style={{borderRadius: "100%"}}
+        />
+      )
+    } else if (userImage === 1) {
+      return (
+        <Avatar alt="Star Wars" src={StarWarsImage}/>
+      )
+    } else if (userImage === 2) {
+      return (
+        <Avatar alt="Ghetto" src={GhettoImage}/>
+      )
+    } else if (userImage === 3) {
+      return (
+        <Avatar alt="Squeletton" src={SquelettonImage}/>
+      )
+    } else if (userImage === 4) {
+      return (
+        <Avatar alt="Pikachu" src={PikachuImage}/>
+      )
+    } else if (userImage === 5) {
+      return (
+        <Avatar alt="Lion" src={LionImage}/>
+      )
+    }
+    else {
+      return (
+        alert('No Prolife Image Found')
+      )
+    }
+  }
+
   const addNewChannel = async () => {
+
+    if (email !== null) {
+      setMembers(members[members.length]=oauth.email)
+      setMembers(members[members.length]=email)
+    } else {
+      setMembers(members[members.length]=oauth.email)
+    }
+
     try{
       const {data: newChannel} = await axios.post(`http://localhost:${config.port}/channels`, {
         name: nameNewChannel,
-        members:[oauth.email],
+        members:members,
         owner: oauth.email
     })
     navigate('/channels')
@@ -214,14 +275,13 @@ export default function Welcome() {
 
     for (let i=0; i<users.length; i++) {
       if (users[i].username === email) {
-        console.log (users[i].id)
         setUserId(users[i].id)
         setUserUsername(users[i].username);
         setUserType(users[i].type);
         setUserLanguage(users[i].language);
         setUserSourdine(users[i].sourdine);
         setUserTheme(users[i].theme);
-        // setUserImage(users[i].image);
+        setUserImage(users[i].image);
       }
     }
 
@@ -239,16 +299,18 @@ const updateUser = async () => {
 
     user.data.type = userType;
     user.data.language = userLanguage;
+    user.data.theme = userTheme;
     user.data.sourdine = userSourdine;
+    user.data.image = userImage;
 
-    const {data: newUser} = await axios.put(`http://localhost:3001/users/${userId}`, 
+    await axios.put(`http://localhost:3001/users/${userId}`, 
     {
       data: {
         user: user
       }
     })
 
-    console.log(newUser)
+    window.location.reload(); 
 
   } catch (err) {
     alert ("Invalide update information")
@@ -270,11 +332,9 @@ const updateUser = async () => {
               css={styles.icon} 
               onClick={(e) => {
                 newChannelOpen();
-                // e.preventDefault();
-                //  navigate('/channels/NewChannel')
               }}
             />
-            <Typography color="textPrimary">
+            <Typography color="#FFFFFF">
               Create channels
             </Typography>
             <Dialog 
@@ -291,6 +351,12 @@ const updateUser = async () => {
                   type="Required"
                   inputRef={valueRef}
                   onChange={() => newChannelName()}
+                />
+                <TextField
+                  id="members"
+                  helperText="Your first channel's members"
+                  label="Channel members"
+                  onChange={NewFriendEmail}
                 />
               </DialogContent>
               <DialogActions>
@@ -309,11 +375,11 @@ const updateUser = async () => {
             <SettingsIcon
               css={styles.icon} 
               onClick={() => {
-                settingsOpen();
                 getUser();
+                settingsOpen();
                 }}
             />
-            <Typography color="textPrimary">
+            <Typography color="#FFFFFF">
               Settings
             </Typography>
             <Dialog 
@@ -355,9 +421,8 @@ const updateUser = async () => {
                       <MaterialUISwitch 
                         sx={{ m: 1 }} 
                         margin="dense"
-                        id="sourdine"
-                        label="Sourdine"
-                        fullWidth
+                        id="mute"
+                        label="Mute"
                         variant="standard"
                         disabled
                         checked={userTheme}
@@ -370,15 +435,14 @@ const updateUser = async () => {
                     control={
                       <BlueSwitch 
                         margin="dense"
-                        id="sourdine"
-                        label="Sourdine"
-                        fullWidth
+                        id="mute"
+                        label="Mute"
                         variant="standard"
                         disabled
                         checked={userSourdine}
                       />
                     } 
-                    label="Sourdine" 
+                    label="Mute" 
                   />
                 </FormGroup>
                  <TextField 
@@ -390,14 +454,20 @@ const updateUser = async () => {
                   variant="standard"
                 > Current Profile Image: 
                 </TextField>
-                <Gravatar/>
+                <CurrentImage/>
               </DialogContent>
               
               <DialogActions>
                 <Button 
+                    style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                    onClick={() => {
+                      settingsClose();
+                      }}>Cancel</Button>
+                <Button 
                   style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
                   onClick={() => {
                     updateOpen();
+                    settingsClose();
                     }}>Update</Button>
               </DialogActions>
             </Dialog>
@@ -437,7 +507,7 @@ const updateUser = async () => {
                   <Select
                     labelId="label"
                     id="selectLanguage"
-                    value={userLanguage}
+                    defaultValue={userLanguage}
                     onChange={newUserLanguage}
                     label="Language"
                   >
@@ -468,7 +538,7 @@ const updateUser = async () => {
                         inputProps={{ 'aria-label': 'controlled' }}
                       />
                     } 
-                    label="Sourdine" 
+                    label="Mute" 
                   />
                 </FormGroup>
                 <TextField
@@ -478,8 +548,16 @@ const updateUser = async () => {
                   label="Profile Image"
                   fullWidth
                   variant="standard"
-                  helperText="You can change your profile Image with Gravatar on this link: "
+                  helperText="You can change your profile Image here or follow the link to update your Gravatar Image "
                 />
+                <Stack direction="row" spacing={2}>
+                  <Gravatar email={oauth.email} css={styles.image} style={{borderRadius: "50%"}} onClick={() => {changeImage(0);}}/>
+                  <Avatar alt="Star Wars" src={StarWarsImage} css={styles.image} onClick={() => {changeImage(1);}}/>
+                  <Avatar alt="Ghetto" src={GhettoImage} css={styles.image} onClick={() => {changeImage(2);}}/>
+                  <Avatar alt="Squeletton" src={SquelettonImage} css={styles.image} onClick={() => {changeImage(3);}}/>
+                  <Avatar alt="Pikachu" src={PikachuImage} css={styles.image} onClick={() => {changeImage(4);}}/>
+                  <Avatar alt="Lion" src={LionImage} css={styles.image} onClick={() => {changeImage(5);}}/>
+                </Stack>
                 <Link 
                   margin="dense"
                   id="image"
@@ -489,20 +567,23 @@ const updateUser = async () => {
                   target="_blank"
                   rel="noreferrer"
                   href="https://fr.gravatar.com/gravatars/new"
-                  >Change my Profile Image</Link>
+                  >Change my Gravatar Image</Link>
               </DialogContent>
               
               <DialogActions>
                 <Button 
                   style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
                   onClick={() => {
+                    updateClose();
+                }}>Cancel</Button>
+                <Button 
+                  style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                  onClick={() => {
                     updateUser();
-                    // settingsClose();
                     updateClose();
                     }}>Update</Button>
               </DialogActions>
             </Dialog>
-
           </div>
         </Grid>
       </Grid>
