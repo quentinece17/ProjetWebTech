@@ -181,7 +181,7 @@ export default function Header({
             </Grid>
           </div>
         :
-          <span>Welcome to the Chat Application</span>
+          <span><h1>Welcome to the Chat Application</h1></span>
       }
       
     </header>

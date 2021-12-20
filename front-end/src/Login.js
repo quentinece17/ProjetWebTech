@@ -8,6 +8,7 @@ import axios from 'axios'
 // Layout
 import { useTheme } from '@mui/styles';
 import { Link } from '@mui/material';
+import {Button} from '@mui/material';
 
 // Local
 import Context from './Context'
@@ -74,7 +75,11 @@ const Redirect = ({
   }
   return (
     <div css={styles.root}>
-        <Link onClick={redirect} color={"#FFFFFF"}>Login with OpenID Connect and OAuth2</Link>
+        <Button
+          style={{backgroundColor: '#FFFFFF', color: '#2f435e'}} 
+          onClick={redirect}
+        >Login with OpenID Connect and OAuth2
+        </Button>
     </div>
   )
 }
