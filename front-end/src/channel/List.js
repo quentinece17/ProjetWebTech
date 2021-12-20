@@ -371,18 +371,18 @@ const updateChannel = async (id, source) => {
   }
 }
 
-const getMembers = async (props) => {
+// const getMembers = async (props) => {
 
-  try {
+//   try {
 
-  const {data: channel} = await axios.get( `http://localhost:3001/channels/${props}`)
+//   const {data: channel} = await axios.get( `http://localhost:3001/channels/${props}`)
   
-  setMembersChannel(channel.members)
+//   setMembersChannel(channel.members)
 
-  } catch (err) {
-    alert("Invalid members")
-  }
-}
+//   } catch (err) {
+//     alert("Invalid members")
+//   }
+// }
 
 const NewMessageContent = (e) => {
   setNewMessage(e.target.value);
@@ -498,6 +498,20 @@ const CurrentImage = (props) => {
   }
 }
 
+var membersMaped = channel.members;
+    const parsing = () => {
+      var final = '';
+      for(let i=0; i<membersMaped.length; i++){
+        final+=membersMaped[i];
+        if(i !== membersMaped.length-1 )
+          final+='\n';
+      }
+      console.log(final);
+      return(final)
+    }
+    
+ const finalmembersMaped = parsing();
+
   return (
     <div css={styles.root} ref={rootEl}>
 
@@ -601,7 +615,6 @@ const CurrentImage = (props) => {
                         style={{backgroundColor: '#2f435e', color: '#FFFFFF'}}
                         onClick={() => {
                           listOpen();
-                          getMembers(channel.id);
                           }}
                         >Channel's Members
                       </Button>
@@ -609,14 +622,15 @@ const CurrentImage = (props) => {
                         <DialogTitle>List of all the channel's members</DialogTitle>
                         <DialogContent>
                         <TextField
-                          disabled
                           id="filled-hidden-label-small"
                           margin="dense"
                           fullWidth
                           multiline
-                          value={membersChannel}
+                          defaultValue={finalmembersMaped}
                           variant="filled"
-                          size="small"
+                          InputProps={{
+                            readOnly: true,
+                          }}
                         />
                         </DialogContent>
                       </Dialog>
