@@ -8,8 +8,6 @@ import SendIcon from '@mui/icons-material/Send';
 import { useTheme } from '@mui/styles';
 import Context from '../Context'
 
-
-
 const useStyles = (theme) => {
   // See https://github.com/mui-org/material-ui/blob/next/packages/material-ui/src/OutlinedInput/OutlinedInput.js
   const borderColor = theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)';
@@ -35,10 +33,7 @@ export default function Form({
   addMessage,
   channel,
 }) {
-  const {
-    oauth, setOauth,
-    drawerVisible, setDrawerVisible
-  } = useContext(Context)
+  const {oauth} = useContext(Context)
   const [content, setContent] = useState('')
   const styles = useStyles(useTheme())
   const onSubmit = async () => {

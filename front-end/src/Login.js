@@ -8,10 +8,6 @@ import axios from 'axios'
 // Layout
 import { useTheme } from '@mui/styles';
 import { Link } from '@mui/material';
-import { Button } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 
 // Local
 import Context from './Context'
@@ -60,9 +56,7 @@ const Redirect = ({
   codeVerifier,
   onUser,
 }) => {
-  const {
-    users, setUsers
-  } = useContext(Context)
+
   const styles = useStyles(useTheme())
   const redirect = (e) => {
     e.stopPropagation()
@@ -77,11 +71,10 @@ const Redirect = ({
       `code_challenge_method=S256`,
     ].join('')
     window.location = url
-    console.log("voila tac: " + config.client_id)
   }
   return (
     <div css={styles.root}>
-        <Link onClick={redirect} color="secondary">Login with OpenID Connect and OAuth2</Link>
+        <Link onClick={redirect} color={"#FFFFFF"}>Login with OpenID Connect and OAuth2</Link>
     </div>
   )
 }
@@ -89,7 +82,6 @@ const Redirect = ({
 const Tokens = ({
   oauth
 }) => {
-  console.log("in token")
   const {setOauth} = useContext(Context)
   const styles = useStyles(useTheme())
   const {id_token} = oauth
@@ -111,10 +103,9 @@ const CheckEmail = async (prop)=> {
   try{
       const {data: users} = await axios.get(`http://localhost:3001/users/`,)
       
-      console.log ("Current user: ", users)
       var valid = Boolean(false);
 
-      if (users.length != 0) {
+      if (users.length !== 0) {
         for (let i=0; i<users.length; i++) {
           if (users[i].username === prop) {
             valid = true
@@ -124,21 +115,21 @@ const CheckEmail = async (prop)=> {
 
       if (valid !== true){
         try{
-          const {data: newUser} = await axios.post(`http://localhost:3001/users`, 
+          await axios.post(`http://localhost:3001/users`, 
           { username: prop, 
             type: "Male",
             language: "English",
-            theme: "true",
-            sourdine: "false",
+            theme: true,
+            sourdine: false,
+            image: 0,
           })
-          console.log("nouveau user:", newUser)
         }catch (err) {
-          alert("oups");
+          alert("Invalid creation of the new user");
         }
       } 
       
   }catch(err){
-    alert("oups");
+    alert("Invalid recuperation of the current users");
   }
 }
 
@@ -178,11 +169,6 @@ const LoadToken = ({
   )
 }
 
-const CheckMail = ({oauth}) => {
-
-  console.log("email : " + oauth.email)
-}
-
 export default function Login({
   onUser
 }) {
@@ -210,7 +196,6 @@ export default function Login({
         <Redirect codeVerifier={codeVerifier} config={config} onUser={onUser} css={styles.root} />
       )
     }else{ // yes: user is already logged in, great, is is working
-      console.log("in else")
       return (
         <Tokens oauth={oauth} css={styles.root} />
       )

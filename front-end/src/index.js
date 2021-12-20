@@ -7,7 +7,7 @@ import { Provider as ContextProvider } from './Context';
 import * as serviceWorker from './serviceWorker';
 import 'typeface-roboto'
 // Layout
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {ThemeProvider } from '@mui/material/styles';
 import theme from './Theme'
 
 import {

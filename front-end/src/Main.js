@@ -9,8 +9,6 @@ import Context from './Context'
 import Channels from './Channels'
 import Channel from './Channel'
 import Welcome from './Welcome'
-import NewChannel from './NewChannel'
-import InviteUser from './InviteUser'
 import {
   Route,
   Routes,
@@ -37,7 +35,6 @@ const useStyles = (theme) => ({
 
 export default function Main() {
   const {
-    // currentChannel, not yet used
     drawerVisible,
   } = useContext(Context)
   
@@ -48,8 +45,8 @@ export default function Main() {
   return (
     <main css={styles.root}>
       <Drawer
-        PaperProps={{ style: { position: 'relative' } }}
-        BackdropProps={{ style: { position: 'relative' } }}
+        PaperProps={{ style: { position: 'relative', backgroundColor: '#44566c' } }}
+        BackdropProps={{ style: { position: 'relative', backgroundColor: '#44566c'} }}
         ModalProps={{
           style: { position: 'relative' }
         }}
@@ -62,8 +59,6 @@ export default function Main() {
       <Routes>
         <Route path=":id" element={<Channel />}/>
         <Route path="*" element={<Welcome />}/>
-        <Route path="/NewChannel" element={<NewChannel />}/>
-        <Route path="/InviteUser" element={<InviteUser />}/>
       </Routes>
     </main>
   );
