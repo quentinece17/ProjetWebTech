@@ -64,6 +64,11 @@ app.post('/channels/:id/messages', async (req, res) => {
   res.status(201).json(message)
 })
 
+app.put('/channels/:id/messages', async (req, res) => {
+  const message = await db.messages.update(req.body)
+  res.status(201).json(message)
+})
+
 app.delete('/channels/:id/messages', async (req, res) => {
   const message = await db.messages.delete(req.params.id, req.body)
   res.status(201).json(message)
@@ -82,14 +87,11 @@ app.post('/users', async (req, res) => {
 })
 
 app.get('/users/:id', async (req, res) => {
-  console.log(req.params.id)
   const user = await db.users.get(req.params.id)
   res.json(user)
 })
 
 app.put('/users/:id', async (req, res) => {
-  console.log(req.params.id)
-  console.log(req.body)
   const user = await db.users.update(req.body)
   res.json(user)
 })
