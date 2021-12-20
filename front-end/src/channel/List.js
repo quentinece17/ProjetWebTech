@@ -5,40 +5,35 @@ import * as React from 'react';
 
 // Layout
 import { useTheme } from '@mui/styles';
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, TextField} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';   
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Stack from '@mui/material/Stack';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import { FixedSizeList } from 'react-window';
 
-import Gravatar from 'react-gravatar'
+import Gravatar from 'react-gravatar';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+
+import StarWarsImage from '../icons/1.star-wars.jpeg';
+import GhettoImage from '../icons/2.ghetto.jpg';
+import SquelettonImage from '../icons/3.squeletton.jpeg';
+import PikachuImage from '../icons/4.pikachu.jpeg';
+import LionImage from '../icons/5.lion.jpeg';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Slide from '@mui/material/Slide';
 
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
 
 import Context from '../Context'
 
 import axios from 'axios';
-
 
 // Markdown
 import { unified } from 'unified'
@@ -89,7 +84,6 @@ const useStyles = (theme) => ({
 })
 
 const onSubmitMessage = async (props) => {
-  console.log("message: " + props)
   try{
       await axios.delete(`http://localhost:3001/channels/${props.channelId}/messages`,
       { data: {
@@ -100,7 +94,7 @@ const onSubmitMessage = async (props) => {
     window.location.reload(); 
 
   } catch(err) {
-    alert ("OUPS");
+    alert ("Error in the Delete of the message");
   }
   
  }
@@ -154,18 +148,20 @@ export default forwardRef(({
 
   const navigate = useNavigate();
   const {
-    oauth, setOauth,
-    drawerVisible, setDrawerVisible,
-    channels, setChannels
+    oauth,
+    setChannels
   } = useContext(Context)
 
   const [openDelete, setOpenDelete] = React.useState(false);
   const [openUpdate, setOpenUpdate] = React.useState(false);
+  const [openUpdateMessage, setOpenUpdateMessage] = useState(false);
   const [openFriends, setOpenFriends] = React.useState(false);
   const [openList, setOpenList] = React.useState(false);
+  const [newMessage, setNewMessage] = useState()
   const [membersChannel, setMembersChannel] = useState("")
   const [name, setName] = useState()
   const [email, setEmail] = useState()
+  const [userImage, setUserImage] = useState(0)
   const valueRef = useRef()
 
   // See https://dev.to/n8tb1t/tracking-scroll-position-with-react-hooks-3bbj
@@ -216,25 +212,9 @@ export default forwardRef(({
         setChannels(currentChannels)
 
     } catch (err) {
-      alert("OUPS");
+      alert("Error in the delete of the channel");
     }
    }
-  
-  //  *********************ALERTE***************************
-      //Faire appara^itre l'alarme uniquement si l'utilisateur appuie sur "delete"
-            // <Stack sx={{ width: '100%' }} spacing={2}>
-            //   <Alert severity="warning" action={
-            //       <Button color="inherit" size="small" onClick={() => {
-            //         onSubmitChannel(props)
-            //       }}>
-            //         Yes
-            //       </Button>
-            //     }>
-            //     <AlertTitle>Warning</AlertTitle>
-            //     Are you sure you want to <strong>DELETE</strong> this channel ? 
-            //   </Alert>
-            // </Stack>
- //  *********************ALERTE***************************
 
  const deleteOpen = () => {
     setOpenDelete(true);
@@ -274,6 +254,15 @@ const newChannelName = () => {
 
 const newFriendEmail = () => {
   setEmail((prevState) => prevState = valueRef.current.value);
+}
+
+const updateMessageOpen = (props) => {
+  setOpenUpdateMessage(true)
+  setNewMessage(props.message.content)
+}
+
+const updateMessageClose = () => {
+  setOpenUpdateMessage(false)
 }
 
 const DeleteChannel = (props) => {
@@ -333,8 +322,6 @@ const updateChannel = async (id, source) => {
 
     const channel = await axios.get( `http://localhost:3001/channels/${id}`)
 
-    console.log("before update : ", channel)
-
     //Update name of the channel
     if (source === 0) {
       channel.data.name = name;
@@ -343,7 +330,7 @@ const updateChannel = async (id, source) => {
       if(!channel.data.members.includes(email)){
         channel.data.members[channel.data.members.length]=email;
       } else {
-        alert('User already member');
+        alert('User is already a member');
       }
     }
 
@@ -353,11 +340,6 @@ const updateChannel = async (id, source) => {
         channel: channel
       }
     })
-
-    var newcurrentChannel = await axios.get(
-      `http://localhost:3001/channels/${id}`
-    )
-    console.log("after update : ", newcurrentChannel)
 
     const {data: newChannels} = await axios.get('http://localhost:3001/channels', 
         {
@@ -385,7 +367,7 @@ const updateChannel = async (id, source) => {
     setChannels(currentChannels)
 
   }catch(err) {
-    alert("OUPS");
+    alert("Error in the update of the channel");
   }
 }
 
@@ -394,15 +376,64 @@ const getMembers = async (props) => {
   try {
 
   const {data: channel} = await axios.get( `http://localhost:3001/channels/${props}`)
-
-  console.log(channel.members)
-
+  
   setMembersChannel(channel.members)
-
-  console.log(membersChannel)
 
   } catch (err) {
     alert("Invalid members")
+  }
+}
+
+const NewMessageContent = (e) => {
+  setNewMessage(e.target.value);
+}
+
+const UpdateButton = (props) => {
+
+  const log = props.oauth.email;
+
+  if (log === props.message.author) {
+
+    return (
+      <span>
+        <Button 
+          size="small"
+          style={{backgroundColor: '#FFFFFF', color: '#2f435e'}}
+          variant="outlined" 
+          onClick={() => {
+            updateMessageOpen(props);
+          }}
+        >Update
+        </Button>
+    </span>
+    )
+  }
+  return (
+    <Button 
+        size="small"
+        variant="outlined" 
+        disabled
+      >Update
+      </Button>
+  )
+
+}
+
+const updateMessage = async (props) => {
+
+  try {
+    props.content = newMessage
+    await axios.put (`http://localhost:3001/channels/${props.channelId}/messages`,
+    { data: {
+          message: props,
+      }
+    })
+
+  } catch (err) {
+    alert ("Invalid message updated");
+  }
+}
+
   }
 }
 
@@ -517,9 +548,11 @@ const getMembers = async (props) => {
                         <DialogTitle>List of all the channel's members</DialogTitle>
                         <DialogContent>
                         <TextField
+                          disabled
                           id="filled-hidden-label-small"
                           margin="dense"
                           fullWidth
+                          multiline
                           value={membersChannel}
                           variant="filled"
                           size="small"
@@ -535,7 +568,6 @@ const getMembers = async (props) => {
           </Grid>
         </Grid>
       </Box>
-
       <ul>
         { messages.map( (message, i) => {
             const {value} = unified()
@@ -546,19 +578,41 @@ const getMembers = async (props) => {
             return (
               <li key={i} css={styles.message}>
                 <p>
-                  <Gravatar
-                      email={message.author}
-                      style={{borderRadius: "100%", width: "30px", height: "30px"}}
-                  />__
-                  <span>{message.author}</span>
-                  {' - '}
-                  <span>{dayjs((message.creation)/1000).calendar()}</span>__
-                  {/* <div> */}
-                  <AuthorMessage email={message.author} creation={message.creation} channelId={message.channelId} oauth={oauth}/>
-                  {/* </div> */}
+                  <Stack direction="row" spacing={2}>
+                    <CurrentImage author={message.author}/>
+                    <span>{message.author}</span>
+                    <span>{dayjs((message.creation)/1000).calendar()}</span>
+                    <AuthorMessage email={message.author} creation={message.creation} channelId={message.channelId} oauth={oauth}/>
+                    <UpdateButton message={message} oauth={oauth}/>
+                    <Dialog open={openUpdateMessage} onClose={updateMessageClose}>
+                      <DialogTitle>Update Message</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText>
+                          You can modify your message below
+                        </DialogContentText>
+                        <TextField
+                          margin="dense"
+                          id="new-message"
+                          label="New Message"
+                          multiline
+                          fullWidth
+                          variant="standard"
+                          value={newMessage}
+                          onChange={NewMessageContent}
+                        />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button 
+                          style={{backgroundColor: '#2f435e', color: '#FFFFFF'}} 
+                          onClick={() => {
+                            updateMessageClose();
+                            updateMessage(message);
+                            }}>Enter</Button>
+                      </DialogActions>
+                  </Dialog>
+                </Stack>
                 </p>
-                <div dangerouslySetInnerHTML={{__html: value}}>
-                </div>
+                <div dangerouslySetInnerHTML={{__html: value}}></div>
               </li>
             )
         })}

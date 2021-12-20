@@ -10,7 +10,6 @@ module.exports = {
     create: async (channel) => {
       if(!channel.name) throw Error('Invalid channel')
       const id = uuid()
-      // console.log (channel)
       await db.put(`channels:${id}`, JSON.stringify(channel))
       return merge(channel, {id: id})
     },
@@ -81,6 +80,12 @@ module.exports = {
         })
       })
     },
+    update: (message) => {
+      var currentMessage = message.data.message;
+      if(!currentMessage) throw Error('Invalid message')
+      db.put(`messages:${currentMessage.channelId}:${currentMessage.creation}`, JSON.stringify(currentMessage))
+      return merge(currentMessage)
+    },
     delete: (channelId, message) => {
       if(!channelId) {throw Error('Invalid channel')}
       if(!message.creation) {throw Error('Invalid creation date')}
@@ -95,11 +100,9 @@ module.exports = {
       return merge(user, {id: id})
     },
     get: async (id) => {
-      console.log("in db: " + id)
       if(!id) throw Error('Invalid id')
       const data = await db.get(`users:${id}`)
       const user = JSON.parse(data)
-      console.log("in db: ", user)
       return merge(user, {id: id})
     },
     list: async () => {
@@ -117,7 +120,6 @@ module.exports = {
         }).on( 'end', () => {
           resolve(users)
         })
-        console.log(users)
       })
     },
     update: (id) => {
