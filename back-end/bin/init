@@ -17,7 +17,7 @@ const config = {
         "test@test.com"
       ],
     messages: [{
-      author: 'sergei',
+      author: 'sergei@kudinov.fr',
       creation: 1602831101929000,
       content: `
       ## 1 - Architecture - Level easy
@@ -50,7 +50,7 @@ const config = {
       \`\`\`
       `.replace(/^ {6}/gm,''),
     },{
-      author: 'david',
+      author: 'david@kudinov2.fr',
       creation: 1602832138892000,
       content: `
       ## 2 - Styles - Level easy
@@ -60,7 +60,7 @@ const config = {
       with an icon, working on the header, providing day/night themes ... be creative
       `.replace(/^ {6}/gm,''),
     },{
-      author: 'sergei',
+      author: 'sergei@kudinov.fr',
       creation: 1602840139202000,
       content: `
       ## 3 - Use an external library - Level medium
@@ -74,7 +74,7 @@ const config = {
       and act accordingly.
       `.replace(/^ {6}/gm,''),
     },{
-      author: 'david',
+      author: 'david@kudinov2.fr',
       creation: 1602844139200000,
       content: `
       ## 4 - Support message contents in Markdown - Level hard
@@ -98,13 +98,13 @@ const config = {
       "test@test.com"
     ],
     messages: [{
-      author: 'sergei',
+      author: 'sergei@kudinov.fr',
       creation: 1602223579200000,
       content: `
       Ping
       `.replace(/^ {6}/gm,'')
     },{
-      author: 'david',
+      author: 'david@kudinov2.fr',
       creation: 1602523579200000,
       content: `
       Pong
@@ -117,13 +117,13 @@ const config = {
       "test@test.com"
     ],
     messages: [{
-      author: 'sergei',
+      author: 'sergei@kudinov.fr',
       creation: 1602223579200000,
       content: `
       What is the answer to the Ultimate Question of Life, the Universe and Everything ?
       `.replace(/^ {6}/gm,'')
     },{
-      author: 'david',
+      author: 'david@kudinov2.fr',
       creation: 1602523579200000,
       content: `
       42
@@ -145,8 +145,27 @@ const config = {
   { username: 'quentin.appelghem@edu.ece.fr',
     type: 'Male',
     language: 'English',
-    theme: 'true',
-    sourdine: 'true'
+    theme: true,
+    sourdine: true,
+    image: 0
+  })
+  await axios.post(`http://localhost:${config.port}/users`, 
+  {
+    username: 'sergei@kudinov.fr',
+    type: 'Male',
+    language: 'English',
+    theme: true,
+    sourdine: true,
+    image: 1
+  })
+  await axios.post(`http://localhost:${config.port}/users`, 
+  {
+    username: 'david@kudinov2.fr',
+    type: 'Male',
+    language: 'English',
+    theme: true,
+    sourdine: true,
+    image: 0
   })
 
   process.exit()

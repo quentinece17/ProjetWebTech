@@ -434,6 +434,67 @@ const updateMessage = async (props) => {
   }
 }
 
+const getUser = async (props) => {
+
+  try {
+
+    const email = oauth.email
+    const {data: users} = await axios.get(`http://localhost:3001/users/`)
+
+    for (let i=0; i<users.length; i++) {
+      if (users[i].username === email) {
+        setUserImage(users[i].image);
+      }
+    }
+
+  } catch (err) {
+    alert ("Invalid User information")
+  }
+
+
+}
+
+const CurrentImage = (props) => {
+
+  getUser(props);
+
+  if (props.author === oauth.email) {
+
+    if (userImage === 0) {
+      return (
+        <Gravatar
+        email={props.author}
+        style={{borderRadius: "100%", width: "30px", height: "30px"}}
+        />
+      )
+    } else if (userImage === 1) {
+      return (
+        <Avatar alt="Star Wars" sx={{ width: "30px", height: "30px" }} src={StarWarsImage}/>
+      )
+    } else if (userImage === 2) {
+      return (
+        <Avatar alt="Ghetto"  sx={{ width: "30px", height: "30px" }} src={GhettoImage}/>
+      )
+    } else if (userImage === 3) {
+      return (
+        <Avatar alt="Squeletton" sx={{ width: "30px", height: "30px" }} src={SquelettonImage}/>
+      )
+    } else if (userImage === 4) {
+      return (
+        <Avatar alt="Pikachu" sx={{ width: "30px", height: "30px" }} src={PikachuImage}/>
+      )
+    } else if (userImage === 5) {
+      return (
+        <Avatar alt="Lion" sx={{ width: "30px", height: "30px" }} src={LionImage}/>
+      )
+    }
+  } else {
+      return (
+        <Gravatar
+        email={props.author}
+        style={{borderRadius: "100%", width: "30px", height: "30px"}}
+        />
+    )
   }
 }
 
